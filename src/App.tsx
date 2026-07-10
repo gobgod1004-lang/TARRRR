@@ -557,10 +557,10 @@ export default function App() {
         /* =========================================================================
             B. MAIN IMMERSIVE COCKPIT INTERFACE (SPLIT VIEW)
             ========================================================================= */
-        <div className="flex-1 flex flex-col lg:flex-row p-3 md:p-5 gap-5 h-[calc(100vh-20px)] overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row p-3 md:p-5 gap-5 h-auto lg:h-[calc(100vh-20px)] overflow-y-auto lg:overflow-hidden">
           
           {/* LEFT COLUMN: Wide 3D Flying View & Flight Console HUD (65%) */}
-          <div className="flex-1 flex flex-col gap-4 overflow-hidden h-full">
+          <div className="flex-1 flex flex-col gap-4 lg:overflow-hidden lg:h-full">
             
             {/* Left Top: Dynamic Flight HUD banner */}
             <div className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 flex flex-col sm:flex-row justify-between items-center gap-2 shadow-lg">

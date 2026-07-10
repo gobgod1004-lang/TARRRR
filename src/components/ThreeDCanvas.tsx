@@ -391,6 +391,64 @@ export default function ThreeDCanvas({
     isDraggingRef.current = false;
   };
 
+  // Touch handlers for mobile screen compatibility
+  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    isMouseInsideRef.current = true;
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      isDraggingRef.current = true;
+      previousMouseRef.current = { x: touch.clientX, y: touch.clientY };
+      
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = touch.clientX - rect.left;
+        const mouseY = touch.clientY - rect.top;
+
+        // Normalize center-offset between -1.0 and 1.0
+        const normX = (mouseX / rect.width) * 2 - 1;
+        const normY = (mouseY / rect.height) * 2 - 1;
+
+        mouseHoverPosRef.current = { x: normX, y: normY };
+      }
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = touch.clientX - rect.left;
+        const mouseY = touch.clientY - rect.top;
+
+        // Normalize center-offset between -1.0 and 1.0
+        const normX = (mouseX / rect.width) * 2 - 1;
+        const normY = (mouseY / rect.height) * 2 - 1;
+
+        mouseHoverPosRef.current = { x: normX, y: normY };
+        isMouseInsideRef.current = true;
+      }
+
+      if (isDraggingRef.current) {
+        const deltaX = touch.clientX - previousMouseRef.current.x;
+        const deltaY = touch.clientY - previousMouseRef.current.y;
+
+        previousMouseRef.current = { x: touch.clientX, y: touch.clientY };
+
+        const sensitivity = 0.006;
+        pitchRef.current = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, pitchRef.current + deltaY * sensitivity));
+        yawRef.current = yawRef.current - deltaX * sensitivity;
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    isDraggingRef.current = false;
+    isMouseInsideRef.current = false;
+  };
+
   // Main 3D Simulation Loop
   useEffect(() => {
     let animationFrameId: number;
@@ -1348,8 +1406,11 @@ export default function ThreeDCanvas({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onClick={handleCanvasClick}
-        className="w-full h-full cursor-grab active:cursor-grabbing block"
+        className="w-full h-full cursor-grab active:cursor-grabbing block touch-none"
       />
 
       {/* HUD Overlay Textures inside canvas frame */}
@@ -1369,15 +1430,15 @@ export default function ThreeDCanvas({
         <div className="text-emerald-400 font-bold mb-1">🎮 NAVIGATION CONTROLS</div>
         {viewMode === 'manual' ? (
           <>
-            <div>• <span className="text-white">Mouse Move</span> : Steer & Look in Cursor Direction</div>
+            <div>• <span className="text-white">Mouse Move / Touch Drag</span> : Steer & Look in Cursor Direction</div>
             <div>• <kbd className="bg-slate-800 px-1 rounded text-white font-sans">W</kbd> <kbd className="bg-slate-800 px-1 rounded text-white font-sans">A</kbd> <kbd className="bg-slate-800 px-1 rounded text-white font-sans">S</kbd> <kbd className="bg-slate-800 px-1 rounded text-white font-sans">D</kbd> / <span className="text-white">Arrows</span> : Adjust Position</div>
             <div>• <span className="text-white">Click Hexagons</span> : Instantly Scan Target</div>
           </>
         ) : (
           <>
             <div>• <span className="text-white">Autopilot engaged</span> : Nanobot self-driving</div>
-            <div>• <span className="text-white">Mouse Move</span> : Look Around inside capsule</div>
-            <div>• <span className="text-white">Click Hexagons</span> : Instantly Scan Target</div>
+            <div>• <span className="text-white">Mouse Move / Touch Drag</span> : Look Around inside capsule</div>
+            <div>• <span className="text-white">Click Hexagons / Tap</span> : Instantly Scan Target</div>
           </>
         )}
       </div>
