@@ -1,0 +1,6 @@
+{
+  "name": "3D 인체 내부 마이크로 모험대 (Micro-Body 3D)",
+  "description": "3D 가상 현실 기술로 인체 내부(혈관, 위장, 폐포, 중추신경계)를 조종하며 탐험하고, AI 의학 가이드인 '닥터 나노'와 대화할 수 있는 인터랙티브 시뮬레이터입니다.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
